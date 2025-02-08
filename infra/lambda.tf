@@ -17,8 +17,10 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = {
       env = "prod"
-      EMAIL_USER    = local.email_user
-      EMAIL_PASSWORD = local.email_password
+      USER_POOL_ID    = local.user_pool_id
+      TWILIO_ACCOUNT_SID = local.twillio_account_sid
+      TWILIO_AUTH_TOKEN = local.twillio_auth_token
+      TWILIO_PHONE_NUMBER = local.twillio_phone_number
     }
   }
 
