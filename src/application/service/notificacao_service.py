@@ -1,3 +1,8 @@
+import os
+
+import boto3
+from botocore.exceptions import ClientError
+
 from infraestructure.repositories.notificacao_interface import NotificacaoInterface
 
 
@@ -14,5 +19,22 @@ class NotificacaoService:
         if not sender:
             raise ValueError(f"Tipo de notificação inválido: {notification_type}")
 
-        to_address = ""  # TODO: buscar email no cognito
-        return sender.enviar_notificacao(nome_usuario, message, to_address)
+        to = "gustavozenke01@gmail.com"
+        # to = self.obter_telefone_usuario(nome_usuario)
+        return sender.enviar_notificacao(to, nome_usuario, message)
+
+    @staticmethod
+    def obter_telefone_usuario(nome_usuario):
+        client = boto3.client('cognito-idp')
+        try:
+            response = client.admin_get_user(
+                UserPoolId=os.getenv("USER_POOL_ID"),
+                Username=nome_usuario
+            )
+            for attribute in response['UserAttributes']:
+                if attribute['Name'] == 'phone_number':
+                    return attribute['Value']
+            return None
+        except ClientError as e:
+            print(f"Erro ao buscar o usuário: {e}")
+            return None

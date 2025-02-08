@@ -14,21 +14,31 @@ def lambda_handler(event, context):
     email_sender = NotificacaoEmail()
     notification_service = NotificacaoService(sms_sender, email_sender)
 
-    for record in event['Records']:
-        body = json.loads(record['body'])
+    body = json.loads(event['Records'][0]['body'])
 
-        nome_usuario = body.get('nome_usuario')
-        tipo_comunicacao = body.get('tipo_comunicacao')
-        message = body.get('mensagem')
+    nome_usuario = body.get('nome_usuario')
+    tipo_comunicacao = body.get('tipo_comunicacao')
+    mensagem = body.get('mensagem')
 
-        if not tipo_comunicacao or not message:
-            logger.error("Payload inválido. Campos necessários: tipo_notificacao, mensagem, destinatario.")
-            continue
+    if not tipo_comunicacao or not mensagem:
+        logger.error("Payload inválido. Campos necessários: tipo_notificacao, mensagem, destinatario.")
+        return
 
-        try:
-            result = notification_service.process_notification(nome_usuario, tipo_comunicacao, message)
-            logger.info(f"Notificação enviada com sucesso: {result}")
-        except ValueError as e:
-            logger.error(f"Erro: {str(e)}")
+    try:
+        result = notification_service.process_notification(nome_usuario, tipo_comunicacao, mensagem)
+        logger.info(f"Notificação enviada com sucesso: {result}")
+    except ValueError as e:
+        logger.error(f"Erro: {str(e)}")
 
     return {"statusCode": 200, "body": "Processamento concluído"}
+
+
+if __name__ == '__main__':
+    event = {
+        "Records": [
+            {
+                "body": '{"nome_usuario":"gustavozenke", "mensagem": "mensagem teste", "tipo_comunicacao": "Email"}',
+            }
+        ]
+    }
+    lambda_handler(event, None)
