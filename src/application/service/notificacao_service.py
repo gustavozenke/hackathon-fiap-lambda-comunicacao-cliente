@@ -11,7 +11,7 @@ class NotificacaoService:
     def __init__(self, sms_sender: NotificacaoInterface, email_sender: NotificacaoInterface):
         self.senders = {
             "SMS": sms_sender,
-            "Email": email_sender
+            "EMAIL": email_sender
         }
 
     def process_notification(self, nome_usuario: str, notification_type: str, message: str):
@@ -19,8 +19,7 @@ class NotificacaoService:
         if not sender:
             raise ValueError(f"Tipo de notificação inválido: {notification_type}")
 
-        to = "gustavozenke01@gmail.com"
-        # to = self.obter_telefone_usuario(nome_usuario)
+        to = self.inserir_pais_telefone(self.obter_telefone_usuario(nome_usuario))
         return sender.enviar_notificacao(to, nome_usuario, message)
 
     @staticmethod
@@ -38,3 +37,10 @@ class NotificacaoService:
         except ClientError as e:
             print(f"Erro ao buscar o usuário: {e}")
             return None
+
+    @staticmethod
+    def inserir_pais_telefone(numero: str) -> str:
+        if not numero.startswith("+") or len(numero) < 4:
+            raise ValueError("Número de telefone inválido")
+
+        return numero.replace("+", "+55", 1)
