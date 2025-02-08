@@ -14,4 +14,5 @@ class NotificacaoService:
         if not sender:
             raise ValueError(f"Tipo de notificação inválido: {notification_type}")
 
-        return sender.enviar_notificacao(nome_usuario, message)
+        to_address = ""  # TODO: buscar email no cognito
+        return sender.enviar_notificacao(nome_usuario, message, to_address)

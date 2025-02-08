@@ -1,4 +1,8 @@
 import logging
+import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 import boto3
 
@@ -11,18 +15,29 @@ logger = logging.getLogger(__name__)
 class NotificacaoSms(NotificacaoInterface):
 
     def __init__(self, aws_region: str = "us-east-1"):
-        self.sns_client = boto3.client("sns", region_name=aws_region)
+        self.ses_client = boto3.client('ses', region_name=aws_region)
 
-    def enviar_notificacao(self, nome_usuario: str, message: str):
-        recipient = ""  # Buscar telefone no cognito
+    def enviar_notificacao(self, to_address: str, nome_usuario: str, message: str):
+        from_address = os.getenv('EMAIL_USER')
+        password = os.getenv('EMAIL_PASSWORD')
+
+        smtp_server = "smtp.gmail.com"
+        smtp_port = 587
+
+        msg = MIMEMultipart()
+        msg['From'] = from_address
+        msg['To'] = to_address
+        msg['Subject'] = "Atualizacao de status de processamento o seu video!"
+        msg.attach(MIMEText(message, 'plain'))
+
         try:
-            response = self.sns_client.publish(
-                PhoneNumber=recipient,
-                Message=message
-            )
-            logger.info(f"SMS enviado com sucesso para {recipient}. MessageId: {response['MessageId']}")
-            return {"status": "success", "method": "SMS", "recipient": recipient, "messageId": response["MessageId"]}
+            server = smtplib.SMTP(smtp_server, smtp_port)
+            server.starttls()
+            server.login(from_address, password)
 
+            server.sendmail(from_address, to_address, msg.as_string())
+            print("Email enviado com sucesso!")
         except Exception as e:
-            logger.error(f"Erro ao enviar SMS para {recipient}: {str(e)}", exc_info=True)
-            raise
+            print(f"Erro ao enviar email: {str(e)}")
+        finally:
+            server.quit()
