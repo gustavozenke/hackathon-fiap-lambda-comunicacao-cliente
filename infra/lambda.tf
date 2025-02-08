@@ -17,6 +17,8 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = {
       env = "prod"
+      EMAIL_USER    = local.email_user
+      EMAIL_PASSWORD = local.email_password
     }
   }
 
