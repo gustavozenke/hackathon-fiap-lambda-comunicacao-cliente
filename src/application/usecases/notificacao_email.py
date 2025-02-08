@@ -8,5 +8,5 @@ logger = logging.getLogger(__name__)
 
 class NotificacaoEmail(NotificacaoInterface):
 
-    def enviar_notificacao(self, nome_usuario: str, message: str):
+    def enviar_notificacao(self, to_address: str, nome_usuario: str, message: str):
         NotImplementedError("Tipo de comunicacao nao implementado")
