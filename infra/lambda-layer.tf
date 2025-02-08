@@ -6,34 +6,22 @@ locals {
   requirements_path = "${path.module}/${local.layer_path}/${local.requirements_name}"
 }
 
-# Cria um diretório local para instalar as dependências do Lambda Layer
 resource "null_resource" "install_dependencies" {
-    triggers = {
+  triggers = {
     requirements = filesha1(local.requirements_path)
   }
+
   provisioner "local-exec" {
     command = <<EOT
-      rm -rf python && mkdir -p python/lib/python3.9/site-packages
+      rm -rf python
+      mkdir -p python/lib/python3.9/site-packages
       pip install -r ${local.requirements_name} -t python/lib/python3.9/site-packages
-      zip -r twilio-layer.zip python
+      zip -r ${local.layer_zip_name} python
     EOT
+
+    working_dir = local.layer_path
   }
 }
-
-#resource "null_resource" "lambda_layer" {
-#  triggers = {
-#    requirements = filesha1(local.requirements_path)
-#  }
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      cd ${local.layer_path}
-#      rm -rf python
-#      mkdir python
-#      pip3 install -r ${local.requirements_name} -t python/
-#      zip -r ${local.layer_zip_name} python/
-#    EOT
-#  }
-#}
 
 resource "aws_s3_bucket" "lambda_layer" {
   bucket_prefix = "lambda-layer"
@@ -52,5 +40,4 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   layer_name          = local.layer_name
   compatible_runtimes = ["python3.9"]
   skip_destroy        = true
-  depends_on          = [aws_s3_object.lambda_layer_zip]
 }
