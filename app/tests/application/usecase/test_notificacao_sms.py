@@ -20,7 +20,7 @@ class TestNotificacaoSms(unittest.TestCase):
     @patch.object(NotificacaoSms, "abrir_client")
     @patch.object(BuscarTelefoneUsuario, "obter_telefone_usuario")
     def test_notificar_sucesso(self, mock_buscar_telefone_usuario, mock_client):
-
+        # Arrange
         mock_buscar_telefone_usuario_instance = MagicMock()
         mock_client.return_value = MagicMock()
         mock_buscar_telefone_usuario_instance.obter_telefone_usuario.return_value = "+987654321"
@@ -32,6 +32,9 @@ class TestNotificacaoSms(unittest.TestCase):
         mock_message.body = "Message sent"
 
         notificacao_sms = NotificacaoSms(mock_buscar_telefone_usuario_instance)
+
+        # Act
         notificacao_sms.notificar("teste_usuario", "Teste de mensagem")
 
+        # Assert
         mock_buscar_telefone_usuario_instance.obter_telefone_usuario.assert_called_once_with("teste_usuario")
