@@ -7,7 +7,7 @@ from application.usecases.notificacao_sms import NotificacaoSms
 from domain.interfaces.notificacao import Notificacao
 from infraestructure.repositories.cognito_repository_impl import CognitoRepositoryImpl
 
-logging.basicConfig(level=logging.INFO)
+logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 cognito_repository = CognitoRepositoryImpl()

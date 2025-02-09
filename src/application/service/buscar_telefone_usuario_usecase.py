@@ -6,7 +6,7 @@ from domain.interfaces.buscar_telefone_usuario import BuscarTelefoneUsuario
 from domain.interfaces.cognito_repository import CognitoRepository
 from utils.utils import inserir_prefixo_codigo_pais
 
-logging.basicConfig(level=logging.INFO)
+logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 

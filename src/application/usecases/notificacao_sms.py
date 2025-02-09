@@ -6,7 +6,7 @@ from twilio.rest import Client
 from domain.interfaces.buscar_telefone_usuario import BuscarTelefoneUsuario
 from domain.interfaces.notificacao import Notificacao
 
-logging.basicConfig(level=logging.INFO)
+logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 
