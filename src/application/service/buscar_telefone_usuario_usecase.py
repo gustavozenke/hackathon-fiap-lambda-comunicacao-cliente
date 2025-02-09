@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class BuscarTelefoneUsuarioUseCaseImpl(BuscarTelefoneUsuario):
+class BuscarTelefoneUsuarioUseCase(BuscarTelefoneUsuario):
 
     def __init__(self, cognito_repository: CognitoRepository):
         self.cognito_repository = cognito_repository

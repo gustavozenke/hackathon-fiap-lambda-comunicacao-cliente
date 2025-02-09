@@ -1,7 +1,7 @@
 import json
 import logging
 
-from application.service.buscar_telefone_usuario_usecase_impl import BuscarTelefoneUsuarioUseCaseImpl
+from application.service.buscar_telefone_usuario_usecase import BuscarTelefoneUsuarioUseCase
 from application.usecases.notificacao_email import NotificacaoEmail
 from application.usecases.notificacao_sms import NotificacaoSms
 from domain.interfaces.notificacao import Notificacao
@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 cognito_repository = CognitoRepositoryImpl()
-buscar_telefone_usuario_usecase = BuscarTelefoneUsuarioUseCaseImpl(cognito_repository)
+buscar_telefone_usuario_usecase = BuscarTelefoneUsuarioUseCase(cognito_repository)
 
 senders = {
     "EMAIL": NotificacaoEmail(),
