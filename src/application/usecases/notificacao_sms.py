@@ -32,4 +32,4 @@ class NotificacaoSms(Notificacao):
             to=telefone
         )
 
-        logger.info(f"Mensagem enviada com sucesso. Response={response}")
+        logger.info(f"Mensagem enviada com sucesso. Status={response.status}. Response={response.body}")
