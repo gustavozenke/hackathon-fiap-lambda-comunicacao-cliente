@@ -16,6 +16,7 @@ class TestLambdaHandler(unittest.TestCase):
     @patch.object(NotificacaoSms, "notificar")
     @patch.object(CognitoRepositoryImpl, "__init__")
     def test_lambda_handler_sucesso(self, mock_cognito_repo, mock_notificacao):
+        # Arrange
         event = {
             "Records": [
                 {
@@ -29,11 +30,21 @@ class TestLambdaHandler(unittest.TestCase):
         }
         mock_notificacao.return_value = None
         mock_cognito_repo.return_value = None
+
+        # Act
         response = lambda_handler(event, None)
 
+        # Assert
         self.assertEqual(response, {"statusCode": 200, "body": "Processamento concluído"})
 
-    def test_lambda_handler_payload_invalido(self):
+    @patch.object(CognitoRepositoryImpl, "__init__")
+    def test_lambda_handler_payload_invalido(self, mock_cognito_repo):
+        # Arrange
         event = {"Records": [{"body": json.dumps({"tipo_comunicacao": "SMS"})}]}
+        mock_cognito_repo.return_value = None
+
+        # Act
         response = lambda_handler(event, None)
+
+        # Assert
         self.assertIsNone(response)
