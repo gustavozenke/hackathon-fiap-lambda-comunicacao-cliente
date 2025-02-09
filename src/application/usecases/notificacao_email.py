@@ -1,12 +1,12 @@
 import logging
 
-from domain.interfaces.notificacao_usecase_interface import NotificacaoUseCaseInterface
+from domain.interfaces.notificacao import Notificacao
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class NotificacaoUseCaseEmail(NotificacaoUseCaseInterface):
+class NotificacaoEmail(Notificacao):
 
-    def enviar_notificacao(self, nome_usuario: str, message: str):
+    def notificar(self, nome_usuario: str, message: str):
         NotImplementedError("Tipo de comunicacao nao implementado")

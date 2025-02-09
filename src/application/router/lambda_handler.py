@@ -1,25 +1,27 @@
 import json
 import logging
 
-from application.service.buscar_telefone_usuario_usecase import BuscarTelefoneUsuarioUseCase
-from application.service.notificacao_service import NotificacaoService
-from application.usecases.notificacao_email import NotificacaoUseCaseEmail
-from application.usecases.notificacao_sms import NotificacaoUseCaseSms
-from infraestructure.repositories.cognito_repository import CognitoRepository
+from application.service.buscar_telefone_usuario_usecase_impl import BuscarTelefoneUsuarioUseCaseImpl
+from application.usecases.notificacao_email import NotificacaoEmail
+from application.usecases.notificacao_sms import NotificacaoSms
+from domain.interfaces.notificacao import Notificacao
+from infraestructure.repositories.cognito_repository_impl import CognitoRepositoryImpl
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-cognito_repository = CognitoRepository()
-buscar_telefone_usuario_usecase = BuscarTelefoneUsuarioUseCase(cognito_repository)
+cognito_repository = CognitoRepositoryImpl()
+buscar_telefone_usuario_usecase = BuscarTelefoneUsuarioUseCaseImpl(cognito_repository)
 
 senders = {
-    "EMAIL": NotificacaoUseCaseEmail(),
-    "SMS": NotificacaoUseCaseSms(buscar_telefone_usuario_usecase)
+    "EMAIL": NotificacaoEmail(),
+    "SMS": NotificacaoSms(buscar_telefone_usuario_usecase)
 }
 
 
 def lambda_handler(event, context):
+    logger.info(f"Mensagem recebida={event}")
+
     body = json.loads(event['Records'][0]['body'])
     nome_usuario = body.get('nome_usuario')
     tipo_comunicacao = body.get('tipo_comunicacao', "EMAIL")
@@ -29,14 +31,10 @@ def lambda_handler(event, context):
         logger.error("Payload inválido. Campos necessários: nome_usuario, mensagem.")
         return
 
-    sender = senders.get(tipo_comunicacao)
-    try:
-        notificacao_service = NotificacaoService(sender)
-        notificacao_service.notificar(nome_usuario, mensagem)
-        logger.info(f"Notificação enviada com sucesso")
-    except ValueError as e:
-        logger.error(f"Erro: {str(e)}")
+    sender: Notificacao = senders.get(tipo_comunicacao)
+    sender.notificar(nome_usuario, mensagem)
 
+    logger.info(f"Notificação enviada com sucesso")
     return {"statusCode": 200, "body": "Processamento concluído"}
 
 

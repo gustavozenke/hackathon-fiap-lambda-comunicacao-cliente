@@ -3,20 +3,22 @@ import os
 
 from twilio.rest import Client
 
-from application.service.buscar_telefone_usuario_usecase import BuscarTelefoneUsuarioUseCase
-from domain.interfaces.notificacao_usecase_interface import NotificacaoUseCaseInterface
+from domain.interfaces.buscar_telefone_usuario import BuscarTelefoneUsuario
+from domain.interfaces.notificacao import Notificacao
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class NotificacaoUseCaseSms(NotificacaoUseCaseInterface):
+class NotificacaoSms(Notificacao):
 
-    def __init__(self, buscar_telefone_usuario_usecase: BuscarTelefoneUsuarioUseCase):
+    def __init__(self, buscar_telefone_usuario_usecase: BuscarTelefoneUsuario):
         self.buscar_telefone_usuario_usecase = buscar_telefone_usuario_usecase
 
-    def enviar_notificacao(self, nome_usuario: str, message: str):
+    def notificar(self, nome_usuario: str, message: str):
         telefone = self.buscar_telefone_usuario_usecase.obter_telefone_usuario(nome_usuario)
+
+        logger.info(f"Enviando SMS para o usuario: {nome_usuario} - telefone:{telefone}. Mensagem={message}")
 
         account_sid = os.getenv("TWILIO_ACCOUNT_SID")
         auth_token = os.getenv("TWILIO_AUTH_TOKEN")
@@ -24,9 +26,10 @@ class NotificacaoUseCaseSms(NotificacaoUseCaseInterface):
 
         client = Client(account_sid, auth_token)
 
-        message = client.messages.create(
+        response = client.messages.create(
             body=message,
             from_=from_,
             to=telefone
         )
-        print(f"Mensagem enviada com SID: {message.sid}")
+
+        logger.info(f"Mensagem enviada com sucesso. Response={response}")

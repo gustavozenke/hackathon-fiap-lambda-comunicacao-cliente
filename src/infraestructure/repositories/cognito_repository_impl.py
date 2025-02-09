@@ -3,10 +3,10 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 
-from domain.interfaces.cognito_repository_interface import CognitoRepositoryInterface
+from domain.interfaces.cognito_repository import CognitoRepository
 
 
-class CognitoRepository(CognitoRepositoryInterface):
+class CognitoRepositoryImpl(CognitoRepository):
 
     def __init__(self):
         self.client_cognito = boto3.client('cognito-idp')
